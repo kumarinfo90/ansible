@@ -6,7 +6,7 @@
   tasks: 
    - name: "installing lamp"
      yum: name={{item}} state=installed disable_gpg_check=yes
-     register: lamp-status
+     register: lampstatus
      with_items:
        - httpd
        - php
@@ -16,6 +16,7 @@
     
    - name: "starting lamp services"
      service: name={{item}} enabled=yes state=started
+     when: lampstatus|success
      with_items:
         - httpd
         - mariadb
