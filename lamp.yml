@@ -1,0 +1,23 @@
+---
+
+- hosts: localhost
+  become: true 
+ 
+  tasks: 
+   - name: "installing lamp"
+     yum: name={{item}} state=installed disable-gpg-check=yes
+     with_items:
+       - http
+       - php
+       - mariadb
+       - mariadb_server
+       - php-mysql
+     register: lamp-status
+    
+   - name: "starting lamp services"
+     service: name={{item}} enabled=yes state=started
+     with_items:
+       - mariadb
+       - httpd
+     when: lamp-status | success
+
