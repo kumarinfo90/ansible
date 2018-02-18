@@ -1,0 +1,25 @@
+---
+
+- hosts: localhost
+  become: ture
+  
+  tasks: 
+    - name: "install httpd"
+      yum: name=httpd state=installed disable_gpg_check=yes
+      register: pkgstatus
+
+    - name: "starting httpd service" 
+      service: name=httpd enabled=yes state=started
+      register: servicestatus
+      when: pkgstatus|success
+    
+    - name: "updating httpd conf"
+      lineinfile: dest=/etc/httpd/conf/httpd.conf state=present regexp='^Listen' line="Listen 90"
+      when: servicestatus|success
+      notify: http-restart
+  
+
+  handlers:
+    - name: "http-restart"
+      service: name=httpd state=restarted/reloaded
+  
